@@ -132,15 +132,34 @@ After evaluation, each script refits preprocessing and its model on all 891
 labeled passengers and predicts the 418 test passengers. Reported full-training
 accuracy is in-sample and should not be interpreted as generalization accuracy.
 
-### Why official test accuracy is unavailable
+### Official Kaggle test scores
 
 Assignment steps 18 and 24 request test-set accuracy. Kaggle does not supply
 the true `Survived` values in `test.csv`, so **local official-test accuracy
-cannot be computed**. The scripts explicitly print this limitation rather
-than invent a score. The holdout accuracy is the local out-of-sample estimate,
-and is labeled as validation accuracy. To obtain Kaggle's reported score,
-manually submit either generated `submission.csv` on the competition page.
-No Kaggle submission is made automatically.
+cannot be computed**. The holdout accuracy is a separate local estimate,
+explicitly labeled as validation accuracy.
+
+Both generated prediction files were manually submitted to Kaggle. The
+completed submissions page reported these scores (verified from the submitted
+screenshots on November 8, 2026):
+
+| Submitted file | Model | Kaggle score | Percentage |
+| --- | --- | ---: | ---: |
+| `submission_python.csv` | Python logistic regression | 0.76794 | 76.794% |
+| `submission_r.csv` | R logistic regression | 0.77033 | 77.033% |
+
+These are Kaggle-reported scores against hidden labels, not the 78.53% local
+holdout accuracy. The scripts print the recorded external score only when the
+generated CSV's file checksum matches the corresponding submitted file.
+This is a lookup of a completed evaluation, not a new local accuracy calculation
+or an automatic Kaggle request. If predictions or file formatting change, the
+scripts instead ask for a new submission; they do not reuse the old score.
+File checksums identify the submitted artifacts, not model inputs or labels.
+
+To obtain a fresh score, open the competition's **Submit Prediction** page
+and upload `results/python/submission.csv` or `results/r/submission.csv`
+separately. Use the model name in the submission description to distinguish
+them. No Kaggle submission is made automatically.
 
 ### Verified Docker results
 
@@ -155,7 +174,7 @@ No Kaggle submission is made automatically.
 Both images were successfully built and run on Docker Desktop 4.98.0 with
 Docker Engine 29.9.2, WSL 2, and Linux/amd64 containers. The containers use
 Python 3.12.8 with the exact versions in `requirements.txt`, and R 4.4.2 with
-its bundled `stats` and `utils` packages. Both exited successfully and wrote
+its bundled `stats`, `utils`, and `tools` packages. Both exited successfully and wrote
 the expected CSVs using the PowerShell commands in section 3.
 
 The predictions match the earlier native Python and WebR checks exactly;
@@ -164,10 +183,14 @@ IDs in original test order, binary labels, and unchanged input files were
 verified. Running either image without a data mount exits with code 1 and a
 clear missing-file message, confirming the dataset is not baked into it.
 
-Verification data came from the
+Initial verification data came from the
 [Hands-On Machine Learning Titanic mirror](https://github.com/ageron/handson-ml2/tree/master/datasets/titanic)
-and are excluded from version control. The reproduction instructions use
-Kaggle. Both official base images are pinned by manifest digest.
+and are excluded from version control. Both containers were then rerun using
+the supplied `titanic.zip` competition files. Despite minor name and age
+precision differences from the mirror, all predictions and reported metrics
+were unchanged. Those predictions were used for the completed Kaggle
+submissions above. The reproduction instructions use Kaggle. Both official
+base images are pinned by manifest digest.
 
 ## 5. Optional native execution
 
@@ -198,7 +221,7 @@ Rscript src/r/install_packages.R
 Rscript src/r/train.R src/data results/r
 ```
 
-R only needs the `stats` and `utils` packages included in R itself.
+R only needs the `stats`, `utils`, and `tools` packages included in R itself.
 `install_packages.R` checks them and prints their versions; it does not download
 unnecessary CRAN packages. Python and R both print an actionable error and
 exit unsuccessfully if inputs are missing or invalid.
