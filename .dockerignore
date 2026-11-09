@@ -1,0 +1,8 @@
+**
+!src/
+!src/python/
+!src/python/**
+!src/r/
+!src/r/**
+**/__pycache__/
+**/*.pyc
