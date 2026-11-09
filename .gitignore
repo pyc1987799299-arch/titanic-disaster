@@ -17,5 +17,6 @@ Thumbs.db
 .env.*
 .vscode/
 .idea/
+.ipynb_checkpoints/
 *.zip
 kaggle.json

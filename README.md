@@ -258,6 +258,38 @@ To clone with GitHub Desktop, choose **File → Clone repository → URL**, past
 local folder. Then choose **Repository → Open in your external editor**.
 Create the ignored data folder and follow sections 2–3 to reproduce the run.
 
+### Local commits and two pull requests
+
+For subsequent changes, start from the latest `develop` and create a local
+feature branch. Replace `feature/my-change` with a new descriptive branch name:
+
+```text
+git fetch origin
+git switch develop
+git pull --ff-only origin develop
+git switch -c feature/my-change
+```
+
+If `develop` is not yet a local branch, use `git switch --track origin/develop`
+instead of `git switch develop` the first time. Edit the relevant files, then
+review and stage only those files. For a setup/documentation change:
+
+```text
+git diff --check
+git diff
+git add .gitignore README.md
+git commit -m "Update repository setup instructions"
+git push -u origin feature/my-change
+```
+
+Authenticate to GitHub when Git prompts you. On GitHub, open a pull request
+with **base: develop** and **compare: feature/my-change**, add a short summary,
+and merge it after review. Then open a second pull request with **base: main**
+and **compare: develop**, add its summary, and merge it. Use merge commits to
+retain the original local commit in both branch histories. Finally update the
+local branches with `git pull --ff-only` on each branch. Keep data, generated
+results, and notebook checkpoints out of commits.
+
 Submit the public repository link, not a ZIP file. `CODEOWNERS` is optional
 and omitted; a CODEOWNERS file by itself would not restrict who can push.
 
