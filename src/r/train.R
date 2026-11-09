@@ -151,11 +151,18 @@ run <- function(data_dir = "src/data", output_dir = "results/r") {
   full_accuracy <- mean(classify(final, full_x) == train$Survived)
   cat(sprintf("Full-training accuracy (in-sample): %.4f\n", full_accuracy))
   predictions <- classify(final, apply_preprocessing(features(test), parameters))
-  cat("Official test accuracy: unavailable; Kaggle test.csv has no true Survived labels.\n")
+  cat("Official test accuracy cannot be computed locally: test.csv has no true Survived labels.\n")
   cat("gender_submission.csv contains example predictions, not ground truth.\n")
   dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
   utils::write.csv(data.frame(PassengerId = test$PassengerId, Survived = predictions),
                    file.path(output_dir, "submission.csv"), row.names = FALSE)
+  fingerprint <- unname(tools::md5sum(file.path(output_dir, "submission.csv")))
+  if (fingerprint == "9ae689a25c2d1ed02944594ff7e36e36") {
+    cat("Recorded Kaggle score for this exact submission file: 0.77033 (77.033%).\n")
+    cat("Source: completed manual Kaggle submission; this score was not computed in this run.\n")
+  } else {
+    cat("No recorded Kaggle score for this output file. Submit it to Kaggle for external scoring.\n")
+  }
   metrics <- data.frame(fit_rows = nrow(fit_x), validation_rows = nrow(val_x),
                         train_rows = nrow(train), test_rows = nrow(test),
                         fit_accuracy = fit_accuracy, validation_accuracy = val_accuracy,
